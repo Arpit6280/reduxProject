@@ -5,14 +5,21 @@ import Products from './components/Shop/Products';
 import { useEffect } from 'react';
 import Notification from './components/UI/Notification';
 import { uiAction } from './store/cartReducer';
+import { fetchCartData } from './store/cart-actions';
 
 let isInitial=true;
 
 function App() {
   const isCartShown= useSelector(state=>state.ui.isCartShown)
   const cart=useSelector(state=>state.cart)
+  const changed=useSelector(state=>state.cart.changed)
   const notification=useSelector(state=>state.ui.notification)
   const dispatch=useDispatch();
+
+
+  useEffect(()=>{
+    dispatch(fetchCartData())
+  },[dispatch])
 
   useEffect(()=>{
     const sendCartData=async()=>{
@@ -43,6 +50,7 @@ function App() {
     isInitial=false
     return;
   }
+  if(changed){
   sendCartData().catch(error=>{
     dispatch(uiAction.showNotification({
       status:'error',
@@ -50,6 +58,7 @@ function App() {
       message:'Sending cart data failed'
     }))
   })
+}
   },[cart,dispatch])
   console.log(isCartShown);
   console.log(notification);
